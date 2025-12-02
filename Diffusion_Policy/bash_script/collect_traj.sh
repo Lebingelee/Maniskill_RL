@@ -4,7 +4,7 @@
 
 
 # 运行您的命令（保持原有参数）
-python run_with_local_maniskill.py ManiSkill/mani_skill/examples/motionplanning/panda/run.py \
+python mani_skill/examples/motionplanning/panda/run.py \
   -e 'LiftPegUpright-v1' \
   -n 200 \
   --only-count-success  \
