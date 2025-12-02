@@ -30,3 +30,25 @@ class PandaWristCam(Panda):
                 mount=self.robot.links_map["camera_link"],
             )
         ]
+
+@register_agent()
+class PandaWristCam256(Panda):
+    """Panda arm robot with the real sense camera attached to gripper"""
+
+    uid = "panda_wristcam256"
+    urdf_path = f"{PACKAGE_ASSET_DIR}/robots/panda/panda_v3.urdf"
+
+    @property
+    def _sensor_configs(self):
+        return [
+            CameraConfig(
+                uid="hand_camera",
+                pose=sapien.Pose(p=[0, 0, 0], q=[1, 0, 0, 0]),
+                width=256,
+                height=256,
+                fov=np.pi / 2,
+                near=0.01,
+                far=100,
+                mount=self.robot.links_map["camera_link"],
+            )
+        ]
