@@ -210,3 +210,6 @@ def build_state_obs_extractor(env_id):
     # NOTE: You can tune/modify state observations specific to each environment here as you wish. By default we include all data
     # but in some use cases you might want to exclude e.g. obs["agent"]["qvel"] as qvel is not always something you query in the real world.
     return lambda obs: list(obs["agent"].values()) + list(obs["extra"].values())
+
+class Value_Distribution():
+    pass

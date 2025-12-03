@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 from mani_skill.utils.wrappers import CPUGymWrapper, FrameStack
 from mani_skill.utils import common
 import gymnasium as gym
-from train_rgbd import Agent, Args
+from CFG_dp import Agent, Args
 import torch
 
 
 @dataclass
 class Args_eval(Args):
-    env_id: str = "PlugCharger-v1"
+    env_id: str = "StackCube-v1"
     """the id of the environment"""
 
     num_eval_envs: int = 1
@@ -53,23 +53,27 @@ def test_env(args, env_kwargs, other_kwargs):
     plt.show()
     envs.close()
 
-def test_obs(args):
-    
+def test_obs():
+
+    args = tyro.cli(Args_eval)
     env_kwargs = dict(
         control_mode=args.control_mode,
         reward_mode="sparse",
         obs_mode=args.obs_mode,
-        render_mode="human",
+        render_mode="rgb_array",
         human_render_camera_configs=dict(shader_pack="default")
     )
     other_kwargs = dict(obs_horizon=args.obs_horizon)
     wrappers=[FlattenRGBDObservationWrapper]
 
-    test = False
+    test = True
     if test == True:
-        test_env( env_kwargs, other_kwargs)
-    env = gym.make(args.env_id, reconfiguration_freq=1, **env_kwargs)
+        test_env(args, env_kwargs, other_kwargs)
+    env = gym.make(args.env_id, reconfiguration_freq=1,
+                   #max_episode_steps=15, 
+                   **env_kwargs)
 
+    obs, info = env.reset()
     for wrapper in wrappers:
         env = wrapper(env)
     env = FrameStack(env, num_stack=other_kwargs["obs_horizon"])
@@ -77,10 +81,13 @@ def test_obs(args):
     obs,info = env.reset()
     print(obs['rgb'].shape)
     
-    action = env.action_space.sample() # this is batched now
+    action = env.action_space.sample() 
     obs, reward, terminated, truncated, info = env.step(action)
     while True:
-        env.render()
+        action = env.action_space.sample() 
+        obs, reward, terminated, truncated, info = env.step(action)
+        print(reward,terminated,truncated)
+
 
 def load_checkpoint(ckpt_path, agent, device):
     checkpoint = torch.load(ckpt_path, map_location=device)
@@ -109,9 +116,6 @@ def _main():
     other_kwargs = dict(obs_horizon=args.obs_horizon)
     wrappers=[FlattenRGBDObservationWrapper]
 
-    test = False
-    if test == True:
-        test_env()
     env = gym.make(args.env_id, reconfiguration_freq=1, **env_kwargs)
 
     for wrapper in wrappers:
@@ -166,5 +170,6 @@ def _main():
     env.close()
 
 if __name__ == "__main__":
-    _main()
+    #_main()
+    test_obs()
     
